@@ -29,12 +29,19 @@ let gr = form.CreateGraphics()
 let draw (gameBall: Ball) =
     use blue = new SolidBrush(Color.Blue)
     use black = new SolidBrush(Color.Black)
+
+    use font = new Font("Arial", 16.0f)
     gr.FillRectangle(black, 0, 0, WIDTH, HEIGHT)
     gr.FillRectangle(blue, gameBall.pos.X, gameBall.pos.Y, 10,10)
+    gr.DrawString("x: " + gameBall.pos.X.ToString(), font, blue,PointF(0.0f,0.0f))
+    gr.DrawString("y: " + gameBall.pos.Y.ToString(), font, blue,PointF(0.0f,25.0f))
+    gr.DrawString("dy: " + gameBall.dir.DY.ToString(), font, blue,PointF(100.0f,0.0f))
+    gr.DrawString("dx: " + gameBall.dir.DX.ToString(), font, blue,PointF(100.0f,25.0f))
+
 
 
 let startingAngle (dir:Direction,degrees:float) =
-    let radians = degrees *  System.Math.PI
+    let radians = degrees *  (System.Math.PI / 180.0)
     let s = System.Math.Sin radians
     let c = System.Math.Cos radians
     let dx = c * dir.DX + s * dir.DY 
@@ -44,11 +51,11 @@ let startingAngle (dir:Direction,degrees:float) =
 let bounce (gameBall: Ball) =
     let checkBounds min max currentPos dir =
         match currentPos with
-            | currentPos when currentPos <= min+10  -> -dir
-            | currentPos when currentPos >= max-5 -> -dir
+            | currentPos when currentPos <= min -> -dir
+            | currentPos when currentPos > max - 10 -> -dir
             | _ -> dir
     let dx = checkBounds 0 WIDTH gameBall.pos.X gameBall.dir.DY
-    let dy = checkBounds 0 HEIGHT gameBall.pos.Y gameBall.dir.DY
+    let dy = checkBounds 0 HEIGHT gameBall.pos.Y gameBall.dir.DX
     {pos = P(gameBall.pos.X,gameBall.pos.Y); dir = Direction(dy, dx) }
 
 let round (x:float) = int (System.Math.Round x)
@@ -66,7 +73,7 @@ let rec gameLoop((gameBall: Ball)) = async {
     do! Async.Sleep(Math.Max(dt, 0.0) |> int)
     return! gameLoop(newBall) }
 
-let gameBall = {pos = P((WIDTH/2)-5,(HEIGHT/2)-5); dir = startingAngle(Direction(5.0,5.0), 50.0) }
+let gameBall = {pos = P((WIDTH/2)-5,(HEIGHT/2)-5); dir = startingAngle(Direction(5.0,5.0), 30.0) }
 
 [<STAThread>]
 do Async.Start(gameLoop(gameBall))
