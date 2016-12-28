@@ -53,13 +53,13 @@ let rec gameLoop((gameBall: ObjectFunctions.GameObject , player1: ObjectFunction
     let now = DateTime.Now
     let dt = 64.0 - DateTime.Now.Subtract(now).TotalMilliseconds
     // Apply the function to change the position of the ball to the ball
-    let newBall = checkAndLetTheObjectBounce (gameBall, player1, player2) |> moveObject |> bounce 
+    let newBall = checkAndLetTheObjectBounce (gameBall, player1, player2) |> moveObject |> perimeter 
     // Current problem, the Objservable.add function needs to take a function which returns unit (which is just nothing)
     // Need to make a function which creates a side effect that changes the direction of the paddle from the input
     form.KeyDown |> Observable.add morphMutableDirVariable
     // Paddle just kept moving, this is in place to default to stop. thought having the else clause in morphMutableDirVariable would do that
     form.KeyUp |> Observable.add stopThePaddle
-    let newPlayer1 = combiningPlayerAndDirection(player1,morphableDirection) |> moveObject
+    let newPlayer1 = combiningPlayerAndDirection(player1) |> moveObject
 
     draw newBall
     drawPlayers (newPlayer1, player2)

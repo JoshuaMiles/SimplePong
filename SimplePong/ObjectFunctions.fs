@@ -5,7 +5,6 @@ open System.Windows.Forms
 
 let WIDTH = 600
 let HEIGHT = 400
-let SCALE = 10
 
 
 type P(x: int, y: int) =
@@ -31,16 +30,17 @@ let startingAngle (dir: Direction,degrees:float) =
 // A function that takes the game object and than applies the DY and DX variables to the current position effectivly moving it
 let moveObject (gameBall : GameObject) =   
     { pos = P(gameBall.pos.X + round gameBall.dir.DX, gameBall.pos.Y + round gameBall.dir.DY); 
-    dir = Direction(gameBall.dir.DX, gameBall.dir.DY); width = gameBall.width; height = gameBall.height}
+    dir = Direction(gameBall.dir.DY, gameBall.dir.DX); width = gameBall.width; height = gameBall.height}
 
-let bounce (gameBall: GameObject) =
-    let checkBounds min max currentPos dir =
+// Keeps the ball within the bounds of the game screeen, going to be used to 
+let perimeter (gameBall: GameObject) =
+    let checkBounds max currentPos dir ballDimension =
         match currentPos with
-            | currentPos when currentPos <= min -> -dir
-            | currentPos when currentPos > max - 10 -> -dir
+            | currentPos when currentPos <= 0 -> -dir
+            | currentPos when currentPos > max - ballDimension -> -dir
             | _ -> dir
-    let dx = checkBounds 0 WIDTH gameBall.pos.X gameBall.dir.DY
-    let dy = checkBounds 0 HEIGHT gameBall.pos.Y gameBall.dir.DX
+    let dx = checkBounds WIDTH gameBall.pos.X gameBall.dir.DX gameBall.width
+    let dy = checkBounds HEIGHT gameBall.pos.Y gameBall.dir.DY gameBall.height
     // Less graceful solution but a common problem with immutability
     {pos = P(gameBall.pos.X,gameBall.pos.Y); dir = Direction(dy, dx); height = gameBall.height; width = gameBall.width }
 
@@ -86,5 +86,10 @@ let stopThePaddle(e:KeyEventArgs) =
 
 
 // GameObject => Direction => GameObject
-let combiningPlayerAndDirection(player: GameObject, newDirection: Direction) = 
-   {pos = player.pos ; dir = newDirection ; height = player.height ; width = player.width}
+let combiningPlayerAndDirection(player: GameObject) = 
+    let checkPlayerBounds height currentPos dyDir =
+       match currentPos with
+           | currentPos when currentPos + round dyDir  <= 0 ->   {pos = player.pos ; dir = Direction(0.0,0.0) ; height = player.height ; width = player.width}
+           | currentPos when currentPos + round dyDir + height > HEIGHT ->  {pos = player.pos ; dir = Direction(0.0,0.0) ; height = player.height ; width = player.width}
+           | _ ->  {pos = player.pos ; dir = morphableDirection ; height = player.height ; width = player.width}
+    checkPlayerBounds player.height player.pos.Y player.dir.DY
