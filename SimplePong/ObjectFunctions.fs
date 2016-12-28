@@ -68,18 +68,21 @@ let checkAndLetTheObjectBounce (gameBall: GameObject, player1: GameObject, playe
 
 
 let keyToDir = function
-    | 38 -> Some(Direction(20.0,0.0))
-    | 40 -> Some(Direction(-20.0,0.0))
+    | 38 -> Some(Direction(-5.0,0.0))
+    | 40 -> Some(Direction(5.0,0.0))
     | _  -> None
 
-let mutable newDir = Direction(0.0,0.0)
+let mutable morphableDirection = Direction(0.0,0.0)
 
 // KeyEventArgs => unit
-let movePlayer(e: KeyEventArgs) =
+let morphMutableDirVariable(e: KeyEventArgs) =
     let dir = keyToDir e.KeyValue
     if Option.isSome dir
-    then Option.get dir
-    else Direction(0.0,0.0)
+    then morphableDirection <- Option.get dir
+    else morphableDirection <- Direction(0.0,0.0)
+
+let stopThePaddle(e:KeyEventArgs) =
+    morphableDirection <- Direction(0.0,0.0)
 
 
 // GameObject => Direction => GameObject
