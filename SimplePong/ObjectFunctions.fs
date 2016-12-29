@@ -13,10 +13,11 @@ type Direction(dy: float, dx: float) =
     member this.DY = dy
     member this.DX = dx
 
-type GameObject = {pos: P ; dir : Direction; width:int ; height: int; currentColour:Color}
+type GameObject = {pos: P ; dir : Direction; width:int ; height: int; currentColour:int}
+
+let linkedListOfColours = [| "#551a8b" ; "#FF69B4" ; "#ff0000" ; "#ff8d00" ; "#ffff00" ; "#00ff00" ; "#00ecff" |]
 
 let round (x:float) = int (System.Math.Round x)
-
 
 let startingAngle (dir: Direction, degrees:float) =
     let radians = degrees * (System.Math.PI / 180.0)
@@ -50,7 +51,7 @@ let collision (gameBall: GameObject, player : GameObject) =
     let gameBallRight = gameBallLeft + gameBall.width
     let gameBallTop = gameBall.pos.Y
     let gameBallBottom = gameBallTop + gameBall.height
-
+    
     let playerLeft = player.pos.X
     let playerRight = playerLeft + player.width
     let playerTop = player.pos.Y
@@ -63,11 +64,15 @@ let collision (gameBall: GameObject, player : GameObject) =
 
 
 // (GameObject => GameObject) => GameObject
-let checkAndLetTheObjectBounce (gameBall: GameObject, player1: GameObject, player2) =
+let checkAndLetTheObjectBounce (gameBall: GameObject, player1: GameObject, player2: GameObject) =
     if collision (gameBall, player1) || collision (gameBall, player2)
-    then {pos = P(gameBall.pos.X, gameBall.pos.Y); dir = Direction(gameBall.dir.DY, -gameBall.dir.DX) ; width = gameBall.width ; height = gameBall.height; currentColour = gameBall.currentColour }
+    then {pos = P(gameBall.pos.X, gameBall.pos.Y); dir = Direction(gameBall.dir.DY, -gameBall.dir.DX) ; width = gameBall.width ; height = gameBall.height; currentColour = (gameBall.currentColour + 1)%7 }
     else  gameBall
 
+let checkToChangeColourOfPaddle(gameBall: GameObject,  player: GameObject) =
+    if collision (gameBall, player)
+    then {pos = P(player.pos.X, player.pos.Y); dir = player.dir ; width = player.width ; height = player.height; currentColour = (player.currentColour + 1)%7 }
+    else  player
 
 // int => Direction Option
 let keyToDir = function
