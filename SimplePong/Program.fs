@@ -31,7 +31,6 @@ let debuggerDraw (gameBall: ObjectFunctions.GameObject, player1: ObjectFunctions
 let draw (gameBall: ObjectFunctions.GameObject) =
     use blue = new SolidBrush(Color.Blue)
     use black = new SolidBrush(Color.Black)
-
     gr.FillRectangle(black, 0, 0, WIDTH, HEIGHT)
     gr.FillRectangle(blue, gameBall.pos.X, gameBall.pos.Y, gameBall.height,gameBall.width)
 
@@ -43,10 +42,8 @@ let drawPlayers (player1:ObjectFunctions.GameObject,player2:ObjectFunctions.Game
     gr.DrawString("y: " + player1.pos.Y.ToString(), font, blue, PointF(0.0f,25.0f))
     gr.DrawString("dy: " + player1.dir.DY.ToString(), font, blue, PointF(100.0f,0.0f))
     gr.DrawString("dx: " + player1.dir.DX.ToString(), font, blue, PointF(100.0f,25.0f))
-    gr.FillRectangle(blue, player1.pos.X, player1.pos.Y, 10, 10)
-    gr.FillRectangle(blue, player2.pos.X, player2.pos.Y, 10, 10)
-
-
+    gr.FillRectangle(blue, player1.pos.X, player1.pos.Y, player1.width, player1.height)
+    gr.FillRectangle(blue, player2.pos.X, player2.pos.Y, player2.width, player2.height)
 
 // The primary loop that the game keeps repeating, acting like the 'motor' of the program
 let rec gameLoop((gameBall: ObjectFunctions.GameObject , player1: ObjectFunctions.GameObject , player2 : ObjectFunctions.GameObject)) = async {
@@ -54,10 +51,7 @@ let rec gameLoop((gameBall: ObjectFunctions.GameObject , player1: ObjectFunction
     let dt = 64.0 - DateTime.Now.Subtract(now).TotalMilliseconds
     // Apply the function to change the position of the ball to the ball
     let newBall = checkAndLetTheObjectBounce (gameBall, player1, player2) |> moveObject |> perimeter 
-    // Current problem, the Objservable.add function needs to take a function which returns unit (which is just nothing)
-    // Need to make a function which creates a side effect that changes the direction of the paddle from the input
     form.KeyDown |> Observable.add morphMutableDirVariable
-    // Paddle just kept moving, this is in place to default to stop. thought having the else clause in morphMutableDirVariable would do that
     form.KeyUp |> Observable.add stopThePaddle
     let newPlayer1 = combiningPlayerAndDirection(player1) |> moveObject
 
@@ -67,11 +61,11 @@ let rec gameLoop((gameBall: ObjectFunctions.GameObject , player1: ObjectFunction
     do! Async.Sleep(Math.Max(dt, 0.0) |> int)
     return! gameLoop(newBall, newPlayer1, player2) }
 
-let gameBall = {pos = P((WIDTH/2)-5,(HEIGHT/2)-5); dir = startingAngle(Direction(5.0,5.0), 30.0) ; height = 10; width = 10 }
+let gameBall = {pos = P((WIDTH/2)-5,(HEIGHT/2)-5); dir = startingAngle(Direction(5.0,5.0), 30.0) ; width = 10 ; height = 10 }
 
-let player1 =  { pos = P(50,50) ; dir = Direction(5.0,5.0) ; height = 100 ; width = 20 }
-
-let player2 = { pos = P(550,250) ; dir = Direction(5.0,5.0); height = 100 ; width = 20 }
+let player1 =  { pos = P(50,50) ; dir = Direction(5.0,5.0) ; width = 20 ; height = 40 }
+                                                                        
+let player2 = { pos = P(550,250) ; dir = Direction(5.0,5.0) ; width = 20 ; height = 40 }
 
 [<STAThread>]
 do Async.Start(gameLoop(gameBall, player1, player2))
