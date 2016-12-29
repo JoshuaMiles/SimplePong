@@ -1,5 +1,6 @@
 ﻿module ObjectFunctions
 open System.Windows.Forms
+open System.Drawing
 
 let WIDTH = 600
 let HEIGHT = 400
@@ -12,13 +13,13 @@ type Direction(dy: float, dx: float) =
     member this.DY = dy
     member this.DX = dx
 
-type GameObject = {pos: P ; dir : Direction; width:int ; height: int}
+type GameObject = {pos: P ; dir : Direction; width:int ; height: int; currentColour:Color}
 
 let round (x:float) = int (System.Math.Round x)
 
 
 let startingAngle (dir: Direction, degrees:float) =
-    let radians = degrees *  (System.Math.PI / 180.0)
+    let radians = degrees * (System.Math.PI / 180.0)
     let s = System.Math.Sin radians
     let c = System.Math.Cos radians
     let dx = c * dir.DX + s * dir.DY 
@@ -27,9 +28,9 @@ let startingAngle (dir: Direction, degrees:float) =
 
 // A function that takes the game object and than applies the DY and DX variables to the current position effectivly moving it
 // GameObject => GameObject
-let moveObject (gameBall : GameObject) =   
-    { pos = P(gameBall.pos.X + round gameBall.dir.DX, gameBall.pos.Y + round gameBall.dir.DY); 
-    dir = Direction(gameBall.dir.DY, gameBall.dir.DX); width = gameBall.width; height = gameBall.height}
+let moveObject (gameObject : GameObject) =   
+    { pos = P(gameObject.pos.X + round gameObject.dir.DX, gameObject.pos.Y + round gameObject.dir.DY); 
+    dir = Direction(gameObject.dir.DY, gameObject.dir.DX); width = gameObject.width; height = gameObject.height; currentColour = gameObject.currentColour }
 
 // Keeps the ball within the bounds of the game screeen, going to be used to 
 // GameObject => GameObject
@@ -41,7 +42,7 @@ let perimeter (gameBall: GameObject) =
     let dx = checkBounds WIDTH gameBall.pos.X gameBall.dir.DX gameBall.width
     let dy = checkBounds HEIGHT gameBall.pos.Y gameBall.dir.DY gameBall.height
     // Less graceful solution but a common problem with immutability
-    {pos = P(gameBall.pos.X,gameBall.pos.Y); dir = Direction(dy, dx) ; width = gameBall.width ; height = gameBall.height }
+    {pos = P(gameBall.pos.X,gameBall.pos.Y); dir = Direction(dy, dx) ; width = gameBall.width ; height = gameBall.height; currentColour = gameBall.currentColour }
 
 // (GameObject => GameObject) => Bool
 let collision (gameBall: GameObject, player : GameObject) =
@@ -64,7 +65,7 @@ let collision (gameBall: GameObject, player : GameObject) =
 // (GameObject => GameObject) => GameObject
 let checkAndLetTheObjectBounce (gameBall: GameObject, player1: GameObject, player2) =
     if collision (gameBall, player1) || collision (gameBall, player2)
-    then {pos = P(gameBall.pos.X, gameBall.pos.Y); dir = Direction(gameBall.dir.DY, -gameBall.dir.DX) ; width = gameBall.width ; height = gameBall.height }
+    then {pos = P(gameBall.pos.X, gameBall.pos.Y); dir = Direction(gameBall.dir.DY, -gameBall.dir.DX) ; width = gameBall.width ; height = gameBall.height; currentColour = gameBall.currentColour }
     else  gameBall
 
 
@@ -94,6 +95,6 @@ let stopThePaddle(e:KeyEventArgs) =
 let combiningPlayerAndDirection(player: GameObject) = 
     let checkPlayerBounds height currentPos =
        match currentPos with
-           | currentPos when (currentPos + round morphableDirection.DY > 0) && (currentPos + round morphableDirection.DY + height < 400)  ->  {pos = player.pos ; dir = morphableDirection ; width = player.width ; height = player.height}
-           | _ ->  {pos = player.pos ; dir = Direction(0.0,0.0) ; width = player.width ; height = player.height }
+           | currentPos when (currentPos + round morphableDirection.DY > 0) && (currentPos + round morphableDirection.DY + height < 400)  ->  {pos = player.pos ; dir = morphableDirection ; width = player.width ; height = player.height; currentColour = player.currentColour}
+           | _ ->  {pos = player.pos ; dir = Direction(0.0,0.0) ; width = player.width ; height = player.height; currentColour = player.currentColour }
     checkPlayerBounds player.height player.pos.Y

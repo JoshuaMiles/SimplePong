@@ -12,38 +12,41 @@ let form = new myForm(Text = "Pong", ClientSize = Size(WIDTH, HEIGHT))
 
 let gr = form.CreateGraphics()
 
-let drawDebugStrings (x:int, y:int, dy:float, dx: float, playerOrBall:String) = 
-    use blue = new SolidBrush(Color.Blue)
-    use black = new SolidBrush(Color.Black)
-    use font = new Font("Arial", 16.0f)
-    gr.DrawString(playerOrBall +  " x: " + x.ToString(), font, blue, PointF(0.0f,0.0f))
-    gr.DrawString(playerOrBall + " y: " + y.ToString(), font, blue, PointF(0.0f,25.0f))
-    gr.DrawString(playerOrBall + " dy: " + dy.ToString(), font, blue, PointF(100.0f,0.0f))
-    gr.DrawString(playerOrBall + " dx: " + dx.ToString(), font, blue, PointF(100.0f,25.0f))
+let linkedListOfColours = "#551a8b" :: "#FF69B4" :: "#ff0000" :: "#ff8d00" :: "#ffff00" :: "#00ff00" :: "#00ecff" :: []
 
-let debuggerDraw (gameBall: ObjectFunctions.GameObject, player1: ObjectFunctions.GameObject, player2 : ObjectFunctions.GameObject, e: KeyEventArgs) =
-    match e.KeyValue with 
-    | 38 ->  drawDebugStrings(gameBall.pos.X,gameBall.pos.Y, gameBall.dir.DY, gameBall.dir.DX, "Ball")
-    | 40 ->  drawDebugStrings(gameBall.pos.X,gameBall.pos.Y, gameBall.dir.DY, gameBall.dir.DX, "Player 1")
-    | 37 ->  drawDebugStrings(player2.pos.X,player2.pos.Y, player2.dir.DY, player2.dir.DX, "Player 2")
-    | _ ->  drawDebugStrings(0,0,0.0,0.0,"")
+// ctrl k c to comment ctrl k u to uncomment
+//let drawDebugStrings (x:int, y:int, dy:float, dx: float, playerOrBall:String) = 
+//    use blue = new SolidBrush(ColorTranslator.FromHtml("#551a8b"))
+//    use black = new SolidBrush(Color.Black)
+//    use font = new Font("Arial", 16.0f)
+//    gr.DrawString(playerOrBall +  " x: " + x.ToString(), font, blue, PointF(0.0f,0.0f))
+//    gr.DrawString(playerOrBall + " y: " + y.ToString(), font, blue, PointF(0.0f,25.0f))
+//    gr.DrawString(playerOrBall + " dy: " + dy.ToString(), font, blue, PointF(100.0f,0.0f))
+//    gr.DrawString(playerOrBall + " dx: " + dx.ToString(), font, blue, PointF(100.0f,25.0f))
+
+//let debuggerDraw (gameBall: ObjectFunctions.GameObject, player1: ObjectFunctions.GameObject, player2 : ObjectFunctions.GameObject, e: KeyEventArgs) =
+//    match e.KeyValue with 
+//    | 38 ->  drawDebugStrings(gameBall.pos.X,gameBall.pos.Y, gameBall.dir.DY, gameBall.dir.DX, "Ball")
+//    | 40 ->  drawDebugStrings(gameBall.pos.X,gameBall.pos.Y, gameBall.dir.DY, gameBall.dir.DX, "Player 1")
+//    | 37 ->  drawDebugStrings(player2.pos.X,player2.pos.Y, player2.dir.DY, player2.dir.DX, "Player 2")
+//    | _ ->  drawDebugStrings(0,0,0.0,0.0,"")
 
 let draw (gameBall: ObjectFunctions.GameObject) =
-    use blue = new SolidBrush(Color.Blue)
+    use ballColour =  new SolidBrush(gameBall.currentColour)
     use black = new SolidBrush(Color.Black)
     gr.FillRectangle(black, 0, 0, WIDTH, HEIGHT)
-    gr.FillRectangle(blue, gameBall.pos.X, gameBall.pos.Y, gameBall.height,gameBall.width)
+    gr.FillRectangle(ballColour, gameBall.pos.X, gameBall.pos.Y, gameBall.height,gameBall.width)
 
 let drawPlayers (player1:ObjectFunctions.GameObject,player2:ObjectFunctions.GameObject) =
-    use blue = new SolidBrush(Color.Blue)
-    use black = new SolidBrush(Color.Black)
-    use font = new Font("Arial", 16.0f)
-    gr.DrawString("x: " + player1.pos.X.ToString(), font, blue, PointF(0.0f,0.0f))
-    gr.DrawString("y: " + player1.pos.Y.ToString(), font, blue, PointF(0.0f,25.0f))
-    gr.DrawString("dy: " + player1.dir.DY.ToString(), font, blue, PointF(100.0f,0.0f))
-    gr.DrawString("dx: " + player1.dir.DX.ToString(), font, blue, PointF(100.0f,25.0f))
-    gr.FillRectangle(blue, player1.pos.X, player1.pos.Y, player1.width, player1.height)
-    gr.FillRectangle(blue, player2.pos.X, player2.pos.Y, player2.width, player2.height)
+    use player1Colour = new SolidBrush(player1.currentColour)
+    use player2Colour = new SolidBrush(player2.currentColour)
+    gr.FillRectangle(player1Colour, player1.pos.X, player1.pos.Y, player1.width, player1.height)
+    gr.FillRectangle(player2Colour, player2.pos.X, player2.pos.Y, player2.width, player2.height)
+  //  gr.DrawString("x: " + player1.pos.X.ToString(), font, blue, PointF(0.0f,0.0f))
+   // gr.DrawString("y: " + player1.pos.Y.ToString(), font, blue, PointF(0.0f,25.0f))
+   // gr.DrawString("dy: " + player1.dir.DY.ToString(), font, blue, PointF(100.0f,0.0f))
+   // gr.DrawString("dx: " + player1.dir.DX.ToString(), font, blue, PointF(100.0f,25.0f))
+
 
 // The primary loop that the game keeps repeating, acting like the 'motor' of the program
 let rec gameLoop((gameBall: ObjectFunctions.GameObject , player1: ObjectFunctions.GameObject , player2 : ObjectFunctions.GameObject)) = async {
