@@ -36,7 +36,9 @@ let linkedListOfColours = [| "#551a8b" ; "#FF69B4" ; "#ff0000" ; "#ff8d00" ; "#f
 let draw (gameBall: ObjectFunctions.GameObject) =
     use ballColour =  new SolidBrush(cConvert linkedListOfColours.[gameBall.currentColour])
     use black = new SolidBrush(Color.Black)
-    gr.FillRectangle(black, 0, 0, WIDTH, HEIGHT)
+    use white = new SolidBrush(Color.White)
+    
+    gr.FillRectangle(black, 0,0, WIDTH, HEIGHT)
     gr.FillRectangle(ballColour, gameBall.pos.X, gameBall.pos.Y, gameBall.height,gameBall.width)
 
 let drawPlayers (player1:ObjectFunctions.GameObject,player2:ObjectFunctions.GameObject) =
@@ -48,7 +50,6 @@ let drawPlayers (player1:ObjectFunctions.GameObject,player2:ObjectFunctions.Game
    // gr.DrawString("y: " + player1.pos.Y.ToString(), font, blue, PointF(0.0f,25.0f))
    // gr.DrawString("dy: " + player1.dir.DY.ToString(), font, blue, PointF(100.0f,0.0f))
    // gr.DrawString("dx: " + player1.dir.DX.ToString(), font, blue, PointF(100.0f,25.0f))
-
 
 // The primary loop that the game keeps repeating, acting like the 'motor' of the program
 let rec gameLoop((gameBall: ObjectFunctions.GameObject , player1: ObjectFunctions.GameObject , player2 : ObjectFunctions.GameObject)) = async {
@@ -63,7 +64,7 @@ let rec gameLoop((gameBall: ObjectFunctions.GameObject , player1: ObjectFunction
     draw newBall
     drawPlayers (newPlayer1, player2)
 
-    do! Async.Sleep(Math.Max(dt, 0.0) |> int)
+   // do! Async.Sleep(Math.Max(dt, 0.0) |> int)
     return! gameLoop(newBall, playerWithIncrementedColour, player2) }
 
 let gameBall = {pos = P((WIDTH/2)-5,(HEIGHT/2)-5); dir = startingAngle(Direction(5.0,5.0), 30.0) ; width = 10 ; height = 10 ; currentColour = 0   }
