@@ -2,7 +2,6 @@
 open System.Windows.Forms
 open System.Drawing
 open ObjectFunctions
-open PlayerFunctions
 
 type myForm() =
     inherit Form()
@@ -14,7 +13,7 @@ let form = new myForm(Text = "Pong", ClientSize = Size(WIDTH, HEIGHT))
 
 let gr = form.CreateGraphics()
 
-let linkedListOfColours = [| "#551a8b" ; "#FF69B4" ; "#ff0000" ; "#ff8d00" ; "#ffff00" ; "#00ff00" ; "#00ecff" |]
+let listOfColours = [| "#551a8b" ; "#FF69B4" ; "#ff0000" ; "#ff8d00" ; "#ffff00" ; "#00ff00" ; "#00ecff" |]
 
 // ctrl k c to comment ctrl k u to uncomment
 //let drawDebugStrings (x:int, y:int, dy:float, dx: float, playerOrBall:String) = 
@@ -34,7 +33,7 @@ let linkedListOfColours = [| "#551a8b" ; "#FF69B4" ; "#ff0000" ; "#ff8d00" ; "#f
 //    | _ ->  drawDebugStrings(0,0,0.0,0.0,"")
 
 let draw (gameBall: ObjectFunctions.GameObject) =
-    use ballColour =  new SolidBrush(cConvert linkedListOfColours.[gameBall.currentColour])
+    use ballColour =  new SolidBrush(cConvert listOfColours.[gameBall.currentColour])
     use black = new SolidBrush(Color.Black)
     use white = new SolidBrush(Color.White)
     
@@ -42,8 +41,8 @@ let draw (gameBall: ObjectFunctions.GameObject) =
     gr.FillRectangle(ballColour, gameBall.pos.X, gameBall.pos.Y, gameBall.height,gameBall.width)
 
 let drawPlayers (player1:ObjectFunctions.GameObject,player2:ObjectFunctions.GameObject) =
-    use player1Colour = new SolidBrush(cConvert linkedListOfColours.[player1.currentColour])
-    use player2Colour = new SolidBrush(cConvert linkedListOfColours.[player2.currentColour])
+    use player1Colour = new SolidBrush(cConvert listOfColours.[player1.currentColour])
+    use player2Colour = new SolidBrush(cConvert listOfColours.[player2.currentColour])
     gr.FillRectangle(player1Colour, player1.pos.X, player1.pos.Y, player1.width, player1.height)
     gr.FillRectangle(player2Colour, player2.pos.X, player2.pos.Y, player2.width, player2.height)
   //  gr.DrawString("x: " + player1.pos.X.ToString(), font, blue, PointF(0.0f,0.0f))
@@ -64,10 +63,10 @@ let rec gameLoop((gameBall: ObjectFunctions.GameObject , player1: ObjectFunction
     draw newBall
     drawPlayers (newPlayer1, player2)
 
-   // do! Async.Sleep(Math.Max(dt, 0.0) |> int)
+    do! Async.Sleep(Math.Max(dt, 0.0) |> int)
     return! gameLoop(newBall, playerWithIncrementedColour, player2) }
 
-let gameBall = {pos = P((WIDTH/2)-5,(HEIGHT/2)-5); dir = startingAngle(Direction(5.0,5.0), 30.0) ; width = 10 ; height = 10 ; currentColour = 0   }
+let gameBall = {pos = P((WIDTH/2)-5,(HEIGHT/2)-5); dir = startingAngle(Direction(5.0,5.0)) ; width = 10 ; height = 10 ; currentColour = 0   }
 
 let player1 =  { pos = P(50,50) ; dir = Direction(5.0,5.0) ; width = 20 ; height = 40 ; currentColour = 0 }
                                                                         

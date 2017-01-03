@@ -2,8 +2,8 @@
 open System.Windows.Forms
 open System.Drawing
 
-let WIDTH = 600
-let HEIGHT = 400
+let WIDTH = 1800
+let HEIGHT = 1200
 
 type P(x: int, y: int) =
     member this.X = x
@@ -15,15 +15,16 @@ type Direction(dy: float, dx: float) =
 
 type GameObject = {pos: P ; dir : Direction; width:int ; height: int; currentColour:int}
 
-let linkedListOfColours = [| "#551a8b" ; "#FF69B4" ; "#ff0000" ; "#ff8d00" ; "#ffff00" ; "#00ff00" ; "#00ecff" |]
+let listOfColours = [| "#551a8b" ; "#FF69B4" ; "#ff0000" ; "#ff8d00" ; "#ffff00" ; "#00ff00" ; "#00ecff" |]
 
 let round (x:float) = int (System.Math.Round x)
 
-let startingAngle (dir: Direction, degrees:float) =
-    let radians = degrees * (System.Math.PI / 180.0)
+let startingAngle (dir: Direction) =
+    let rand = System.Random()
+    let radians = 360.0 * rand.NextDouble()
     let s = System.Math.Sin radians
     let c = System.Math.Cos radians
-    let dx = c * dir.DX + s * dir.DY 
+    let dx = c * dir.DX + s * dir.DY
     let dy = -s * dir.DX + c * dir.DY
     Direction(dy,dx)
 
@@ -38,7 +39,7 @@ let moveObject (gameObject : GameObject) =
 let perimeter (gameBall: GameObject) =
     let checkBounds max currentPos dir ballDimension =
         match currentPos with
-            | currentPos when (currentPos <= 0) || (currentPos > max - ballDimension) -> -dir
+            | curentPos when (currentPos <= 0) || (currentPos > max - ballDimension) -> -dir
             | _ -> dir
     let dx = checkBounds WIDTH gameBall.pos.X gameBall.dir.DX gameBall.width
     let dy = checkBounds HEIGHT gameBall.pos.Y gameBall.dir.DY gameBall.height
@@ -66,7 +67,7 @@ let collision (gameBall: GameObject, player : GameObject) =
 // (GameObject => GameObject) => GameObject
 let checkAndLetTheObjectBounce (gameBall: GameObject, player1: GameObject, player2: GameObject) =
     if collision (gameBall, player1) || collision (gameBall, player2)
-    then {pos = P(gameBall.pos.X, gameBall.pos.Y); dir = Direction(gameBall.dir.DY, -gameBall.dir.DX) ; width = gameBall.width ; height = gameBall.height; currentColour = (gameBall.currentColour + 1)%7 }
+    then {pos = P(gameBall.pos.X, gameBall.pos.Y); dir = startingAngle(Direction(gameBall.dir.DY, -gameBall.dir.DX)) ; width = gameBall.width ; height = gameBall.height; currentColour = (gameBall.currentColour + 1)%7 }
     else  gameBall
 
 let checkToChangeColourOfPaddle(gameBall: GameObject,  player: GameObject) =
